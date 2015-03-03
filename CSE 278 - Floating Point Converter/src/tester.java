@@ -35,7 +35,7 @@ public class tester {
 			
 			out.println(dataOut);
 		}
-		
+		// close resources
 		in.close();
 		out.close();
 	}
@@ -60,8 +60,31 @@ public class tester {
 		dataIn = dataIn.substring(1);  // Since first char is resolved, you can remove it 
 		
 		String[] leftAndRightOfTheDecimal = dataIn.split(".");  // The left and right hand side of the float are handled differently and therefore should be split and handled separately 
-		ret += normalConversionToBinary(leftAndRightOfTheDecimal[0]);
-		return ret;
+		ret += normalConversionToBinary(leftAndRightOfTheDecimal[0]); // convert left of the decimal
+		ret += floatingPointConversionToBinary(leftAndRightOfTheDecimal[1]);  // convert right of the decimal
+		
+		return ret; // return converted string
+	}
+
+	private static String floatingPointConversionToBinary(String val) {
+		String convertedValue = ".";  // the decimal was lost with the split from floatToBinary, added here
+		long remainder = 0;
+		int i = 0;  // counter
+		
+		while(Integer.parseInt(val) > 0 && i < 24) {  // max of 23 digits in a 32 bit machine so i must be lower than 24
+			if(2 * Integer.parseInt(val) >= 1) {		// check remainder
+				remainder = (2 * Integer.parseInt(val))-1; // set remainder
+				convertedValue += "1";
+			} else {
+				remainder = (2 * Integer.parseInt(val)); // set remainder
+				convertedValue += "0";
+			}
+			
+			val = remainder + ""; //update val
+			i++; // increment counter
+		}
+		
+		return convertedValue; // return converted value
 	}
 
 	/**
