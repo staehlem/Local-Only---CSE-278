@@ -49,16 +49,18 @@ public class Tester {
 		}
 		dataIn = dataIn.substring(1);
 		
-		double resultBias = Integer.parseInt(convertTo10(dataIn.substring(0, 8))) - 127;  //This is used in main equation
+		float resultBias = Float.parseFloat(convertTo10(dataIn.substring(0, 8))) - 127;  //This is used in main equation
+//		System.out.println(convertTo10(dataIn.substring(0, 8)));
+//		System.out.println(resultBias);
 		
-		dataIn.substring(8);
-		double values = 1.0;
-		for(int i = 0; i < 24; i++) {
+		dataIn = dataIn.substring(8);
+		float values = 1;
+		for(int i = 0; i < 23; i++) {
 			if(dataIn.charAt(i) == 1) {
 				values += Math.pow(2.0, -i);
 			}
 		}
-		ret += (double)(values * Math.pow(2.0, resultBias));
+		ret += (float)(values * Math.pow(2.0, resultBias));
 		
 		return ret;
 	}
