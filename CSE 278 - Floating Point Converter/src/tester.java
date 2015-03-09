@@ -5,6 +5,7 @@ import java.util.Scanner;
 public class Tester {
 	public static Scanner in;
 	public static PrintWriter out;
+	private static final String BASE = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";  // Used with index of to allow for easy conversion of letters to base value integers
 	
 	public static void main(String[] args) {
 		try { readAndConvert(); }  // Call method readAndConvert, this does the bulk of the work in the program
@@ -43,8 +44,21 @@ public class Tester {
 	private static String binaryToFloat(String dataIn) {
 		String ret = "";
 		
+		if(dataIn.charAt(0) == 1) {
+			ret += "-";
+		}
+		dataIn = dataIn.substring(1);
 		
+		double resultBias = Integer.parseInt(convertTo10(dataIn.substring(0, 8))) - 127;  //This is used in main equation
 		
+		dataIn.substring(8);
+		double values = 1.0;
+		for(int i = 0; i < 24; i++) {
+			if(dataIn.charAt(i) == 1) {
+				values += Math.pow(2.0, -i);
+			}
+		}
+		ret += (double)(values * Math.pow(2.0, resultBias));
 		
 		return ret;
 	}
@@ -154,5 +168,24 @@ public class Tester {
 		}
 																																	//System.out.println(convertedValue);
 		return convertedValue;
+	}
+	
+	/**
+	 * This method converts a value of a base other than ten and converts it to that integer
+	 * @param from starting base, not 10
+	 * @param to 10 in this case
+	 * @param val string representation of the current value at the current base
+	 * @return return new value at base 10
+	 */
+	private static String convertTo10(String val) {
+	
+		long total = 0;	// long because total could get very large depending on val
+		
+		while(val.length() > 0) {
+			total += BASE.indexOf(val.charAt(0)) * Math.pow(2, val.length()-1);	// adds an index of the global character string above 
+			val = val.substring(1);		// chop off index 0 and loop again
+		}
+		
+		return "" + total;
 	}
 }	
