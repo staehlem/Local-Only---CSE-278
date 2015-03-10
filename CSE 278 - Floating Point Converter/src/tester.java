@@ -51,6 +51,7 @@ public class Tester {
 
 	private static String floatToBinary(String dataIn) {
 		String ret = "";
+		String workingValue = "";
 		
 		if(dataIn.charAt(0) == '-'){  // Determine the first binary # based on neg or pos value
 			ret += "1";
@@ -58,14 +59,50 @@ public class Tester {
 		} else {
 			ret += "0";
 		}
-				
-		System.out.println();
 		
-		String[] leftAndRightOfTheDecimal = dataIn.split("\\.");  // The left and right hand side of the float are handled differently and therefore should be split and handled separately 
-		ret += normalConversionToBinary(leftAndRightOfTheDecimal[0]); // convert left of the decimal
-		ret += floatingPointConversionToBinary(leftAndRightOfTheDecimal[1]);  // convert right of the decimal
+		String[] leftAndRightOfTheDecimal = dataIn.split("\\.");  						// The left and right hand side of the float are handled differently and therefore should be split and handled separately 
+		workingValue += normalConversionToBinary(leftAndRightOfTheDecimal[0]); 			// convert left of the decimal
+		workingValue += floatingPointConversionToBinary(leftAndRightOfTheDecimal[1]);   // convert right of the decimal
 		
+		// workingValue now represents the non- 32 bit converted representation of our floating point #
+		
+																																				//System.out.println(workingValue);
+		int numberOfSpacesTheDecimalMovedForNormalization = 0;
+		if(workingValue.charAt(0) == '.') {		//make sure '.' is in the second position (index of 1)
+			workingValue = "0" + workingValue;
+		}
+		
+		if(workingValue.indexOf('.') != 1) {		//normalize the value
+			numberOfSpacesTheDecimalMovedForNormalization = workingValue.indexOf('.') - 1;
+			workingValue = workingValue.substring(0, workingValue.indexOf('.')) + workingValue.substring(workingValue.indexOf('.') + 1);		//use substrings to "move" the decimal
+			workingValue = workingValue.substring(0, 1) + "." + workingValue.substring(1);
+		}
+																																				//System.out.println(workingValue);
+		
+		int bias = 127 + numberOfSpacesTheDecimalMovedForNormalization;  // set the bias
+																																				//ret += normalConversionToBinary(bias + "");
+		if(normalConversionToBinary(bias + "").length() < 8){
+			ret += createStringOfZeroes(8 - normalConversionToBinary(bias + "").length()) + normalConversionToBinary(bias + "");
+		} else {
+			ret += normalConversionToBinary(bias + "");
+		}
+		
+		/*
+		 * Now we need to add the last 23 bits on
+		 */
+		String replacementBinaryNums = workingValue.substring(2, 25);	//the ints that will be replacing the zeros, restricted to 23 bits
+
+																																				//System.out.println(replacementBinaryNums);
+		ret += replacementBinaryNums;
 		return ret; // return converted string
+	}
+
+	// this ensures that the 8-bit conversion of the bias has the proper # of characters
+	private static String createStringOfZeroes(int i) {
+		String str = "";
+		for(int j = 0; j < i; j++)
+			str += "0";
+		return str;
 	}
 
 	/**
@@ -78,11 +115,8 @@ public class Tester {
 		String convertedValue = ".";  // the decimal was lost with the split from floatToBinary, added here
 		float remainder = 0;
 		int i = 0;  // counter
-		
 																																	//System.out.println("Made it to RIGHT side conversion " + val);
 																																	//System.out.println(Float.parseFloat(val));
-		
-		
 		while(Float.parseFloat(val) > 0 && i < 24) {  // max of 23 digits in a 32 bit machine so 'i' must be lower than 24
 			
 			if((Float.parseFloat(val) * 2) >= 1) {		// check remainder
